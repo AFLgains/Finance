@@ -18,7 +18,11 @@
 .Rproj.user/
 
 # Compiled Python code
-__pycache__
+scripts/__pycache__/
+scripts/strategies/__pycache__/
+scripts/configuration/__pycache__/
+scripts/data/__pycache__/
+scripts/datasources/__pycache__/
 
 # produced vignettes
 vignettes/*.html
@@ -61,6 +65,13 @@ output/**/*.png
 python/traindata/*.json
 python/traindata/*.pkl
 
+old/*.pkl
+raw_data/*.csv
+raw_data/download/*.zip
+raw_data/cache/*
+raw_data/info/*
+.zip
+
 # Pickle files for Stan models and drawn samples
 output/**.pkl
 
@@ -71,4 +82,14 @@ output/**.pkl
 python\traindata\*.json
 
 .idea/*
+.idea/*.xml
+.idea\*.xml
 
+
+
+.env
+*.xml
+*.csv
+*.pkl
+*.xml
+.idea/workspace.xml
