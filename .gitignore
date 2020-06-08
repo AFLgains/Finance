@@ -24,6 +24,12 @@ scripts/configuration/__pycache__/
 scripts/data/__pycache__/
 scripts/datasources/__pycache__/
 
+scripts/__pycache__/
+scripts/strategies/__pycache__/*.pyc
+scripts/configuration/__pycache__/
+scripts/data/__pycache__/
+scripts/datasources/__pycache__/
+
 # produced vignettes
 vignettes/*.html
 vignettes/*.pdf
@@ -78,14 +84,13 @@ output/**.pkl
 # Zip files
 *.zip
 
-# Outputs files for stan model predict function 
+# Outputs files for stan model predict function
 python\traindata\*.json
 
 .idea/*
+.idea\*
 .idea/*.xml
 .idea\*.xml
-
-
 
 .env
 *.xml
@@ -93,3 +98,29 @@ python\traindata\*.json
 *.pkl
 *.xml
 .idea/workspace.xml
+.pre-commit-config.yaml
+.idea/workspace.xml
+.idea/modules.xml
+.idea/misc.xml
+.idea/libraries/R_User_Library.xml
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/Finance.iml
+.idea/deployment.xml
+scripts/configuration/scenarios.yml
+scripts/data/__pycache__/data_classes.cpython-37.pyc
+scripts/data/__pycache__/metrics.cpython-37.pyc
+scripts/data/__pycache__/performance.cpython-37.pyc
+scripts/debug.log
+scripts/metrics/__pycache__/__init__.cpython-37.pyc
+scripts/metrics/__pycache__/financial_metrics.cpython-37.pyc
+*.pyc
+*.pickle
+*.pyc
+.idea/Finance.iml
+
+scripts/old/visualise_stock_price.py
+scripts/strategies/__pycache__/strategies.cpython-37.pyc
+.idea/deployment.xml
+scripts/data/__pycache__/data_classes.cpython-37.pyc
+scripts/data/__pycache__/metrics.cpython-37.pyc
+scripts/data/__pycache__/performance.cpython-37.pyc

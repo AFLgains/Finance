@@ -1,9 +1,10 @@
+import datetime as dt
 from dataclasses import dataclass
 from typing import List
-import pandas as pd
-import datetime as dt
+
 import numpy as np
-from data.performance import performance_outcome
+import pandas as pd
+
 
 @dataclass
 class strategy_metrics:
@@ -11,18 +12,20 @@ class strategy_metrics:
     stock_ticker: str
     start_time: dt.datetime
     end_time: dt.datetime
-    batting_average:float
-    average_gain:float
-    average_loss:float
-    ratio:float
-    maxR:float
+    batting_average: float
+    average_gain: float
+    average_loss: float
+    ratio: float
+    maxR: float
     maxL: float
     annualised_return_rate: float
 
 
-def evaluate_strategies(data_df: pd.DataFrame,
-                        stock_tocker_str:str,
-                        performance_outcome: performance_outcome) -> strategy_metrics:
+def evaluate_strategies(
+    data_df: pd.DataFrame,
+    stock_tocker_str: str,
+    performance_outcome: performance_outcome,
+) -> strategy_metrics:
     gains = 0
     ng = 0
     losses = 0
@@ -40,14 +43,14 @@ def evaluate_strategies(data_df: pd.DataFrame,
 
     totalR = round((totalR - 1) * 100, 2)
 
-    if (ng > 0):
+    if ng > 0:
         avgGains = gains / ng
         maxR = max(performance_outcome.pct_change)
     else:
         avgGains = 0
         maxR = "undefined"
 
-    if (nl > 0):
+    if nl > 0:
         avgLoss = losses / nl
         maxL = min(performance_outcome.pct_change)
         ratio = -avgGains / avgLoss
@@ -61,22 +64,26 @@ def evaluate_strategies(data_df: pd.DataFrame,
     else:
         battingAvg = 0
 
-    total_years = (data_df["formatted_date"][data_df["formatted_date"].count() - 1] - data_df["formatted_date"][0]).days / 365
-    annualised_return_rate = round(((1 + totalR / 100) ** (1 / total_years) - 1) * 100, 2)
+    total_years = (
+        data_df["formatted_date"][data_df["formatted_date"].count() - 1]
+        - data_df["formatted_date"][0]
+    ).days / 365
+    annualised_return_rate = round(
+        ((1 + totalR / 100) ** (1 / total_years) - 1) * 100, 2
+    )
 
     metrics = strategy_metrics(
-        strategy_name= performance_outcome.strategy_name,
-        stock_ticker = stock_tocker_str,
-        start_time = data_df["formatted_date"][0],
-        end_time= data_df["formatted_date"][data_df["formatted_date"].count() - 1],
-        batting_average= battingAvg,
-        average_gain= avgGains,
-        average_loss= avgLoss,
-        ratio= ratio,
-        maxR= maxR,
-        maxL= maxL,
-        annualised_return_rate= annualised_return_rate,
+        strategy_name=performance_outcome.strategy_name,
+        stock_ticker=stock_tocker_str,
+        start_time=data_df["formatted_date"][0],
+        end_time=data_df["formatted_date"][data_df["formatted_date"].count() - 1],
+        batting_average=battingAvg,
+        average_gain=avgGains,
+        average_loss=avgLoss,
+        ratio=ratio,
+        maxR=maxR,
+        maxL=maxL,
+        annualised_return_rate=annualised_return_rate,
     )
 
     return metrics
-
