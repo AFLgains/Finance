@@ -38,11 +38,11 @@ def test_strategy(strat_class, name, data_df, purchase_frequency, **kwargs):
         print(FORMATTED_STRING * len(HEADER) % tuple(results))
         return strategy_instance
     else:
+        annualised_trades = [(st.pct_change+1)**(365/(st.date_sold-st.date_bought).days)-1 for st in strategy_instance.portfolio.past_purchases]
         expecte0_annualised_return = round(
-            np.mean([st.annualised_return_rate for st in results]), 2
+            np.mean(annualised_trades), 2
         )
-        spread = 2 * round(np.std([st.annualised_return_rate for st in results]), 2)
-        error_in_expected_return = 2 * round(spread / np.sqrt(len(results)), 2)
+        spread = 2 * round(np.std(annualised_trades), 2)
         res = [
             name,
             len(results),
@@ -58,11 +58,11 @@ def test_strategy(strat_class, name, data_df, purchase_frequency, **kwargs):
         assert len(res) == len(HEADER)
         print(FORMATTED_STRING * len(res) % tuple(res))
 
-        plt.hist([x.annualised_return_rate for x in results],bins = 20);
+        plt.hist(annualised_trades,bins = max(15,round(len(annualised_trades)/10)))
         plt.xlabel("Annualised returns per stock")
         plt.ylabel("Return (%)")
         plt.title(name)
-        plt.xlim([-1,1])
+        plt.xlim([-2,2])
         plt.show()
 
         #plt.hist([x.annualised_return_rate for x in strategy_instance.portfolio.past_purchases],bins = 20);

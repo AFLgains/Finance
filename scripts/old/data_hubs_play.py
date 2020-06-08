@@ -12,7 +12,7 @@ sf.set_api_key("AH4RWcm8001Mmz48dGzbZ13LGp1O5Yqw")
 
 # Set the local directory where data-files are stored.
 # The dir will be created if it does not already exist.
-sf.set_data_dir(os.path.join("C:\Personalprojects\Finance\scripts", "raw_data"))
+sf.set_data_dir(os.path.join("/", "raw_data"))
 
 market = 'us'
 tickers = ['AAPL', 'AMZN', 'MSFT','DIS','dasdasd']

@@ -2,8 +2,8 @@ defaults:
   refresh_rate: 30
   offset: 60
   save_output: False
-  min_volume: -1
-  min_price: -1
+  min_volume: 0.0001
+  min_price: 0.05
   min_records: 365
 named_runs:
   test_validation:
