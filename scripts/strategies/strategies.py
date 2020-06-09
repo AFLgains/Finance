@@ -8,8 +8,10 @@ import pandas as pd
 from datasources.data_classes import (portfolio, stock, stock_purchase, trade_class, strategy_metrics)
 from datasources.performance import test_strategy
 from yahoofinancials import YahooFinancials
-
+from functools import reduce
 from collections import defaultdict
+from pypfopt import EfficientFrontier, objective_functions, risk_models, expected_returns
+
 
 class strategy:
     """
@@ -29,6 +31,7 @@ class strategy:
         self.portfolio = portfolio(past_purchases = [],current_purchases = [],date = min(self.dates_considered))
         self.stock_dictionary ={stock.name:stock for stock in self.stock_data}
         self.redistribute = redistribute
+        self.opt_port = True
 
     def get_unique_dates(self,x,data_col: str):
         dates = set()
@@ -140,6 +143,44 @@ class strategy:
         if len(self.portfolio.current_purchases)>0:
             return any([stock_name==cp.name for cp in self.portfolio.current_purchases])
         return False
+
+    def get_flat_distriutions(self,portfolio_cash,buys):
+        output = {}
+        total_cash = sum([v for x, v in portfolio_cash.items()])
+        for b in buys:
+            output[b.name] = total_cash / len(buys)
+        return output
+
+    def gen_price_history_df(self, tickers):
+
+        data_frames = [self.stock_dictionary[b].price_history[["adjclose"]].rename(columns={"adjclose": b}) for b in tickers]
+        df_merged = reduce(
+            lambda left, right: pd.merge(left, right, on="formatted_date", how="left"),
+            data_frames,
+        )
+
+        return df_merged
+
+    def get_optimal_distributions(self,portfolio_cash,buys,buy_date):
+        output = {}
+        total_cash = sum([v for x, v in portfolio_cash.items()])
+        price_histories = self.gen_price_history_df([b.name for b in buys])
+
+        # Obtain the historical return and sample cov.
+        mu = expected_returns.mean_historical_return(price_histories)
+        S = risk_models.sample_cov(price_histories)
+
+        # Optimise for maximal Sharpe ratio
+        ef = EfficientFrontier(mu, S)
+        ef.add_objective(objective_functions.L2_reg, gamma=1)
+        ef.max_sharpe()
+        cleaned_weights = ef.clean_weights()
+
+        # Add it to buys
+        for b in buys:
+            output[b.name] = cleaned_weights[b.name]*total_cash
+        return output
+
 
     def evaluate(self):
         # Evaluation will be, for every company you invest in, put a dollar in, and then measure the % increase in
@@ -274,10 +315,16 @@ class strategy:
             # then do buys
             if buys:
                 if self.redistribute:
-                    incr_redistribute = sum([v for x,v in portfolio_cash.items()]) / len(buys)
+                    incr_redistribute = {}
+
+                    if self.opt_port and len(buys)>1:
+                        incr_redistribute = self.get_optimal_distributions(portfolio_cash =portfolio_cash, buys = buys, buy_date = purchase_date)
+                    else:
+                        incr_redistribute = self.get_flat_distriutions(portfolio_cash =portfolio_cash, buys = buys)
+
                     for b in buys:
                         trades[b.name] = trade_class(stock_purchase_data = b,
-                                               amount = stock_purchased_cash[b.name] + incr_redistribute,
+                                               amount = stock_purchased_cash[b.name] + incr_redistribute[b.name],
                                                status = "open")
                         stock_purchased_cash[b.name] = 0
                     for x in portfolio_cash.keys():

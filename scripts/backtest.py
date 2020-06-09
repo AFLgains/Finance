@@ -327,9 +327,6 @@ def main():
     buy_and_hold_year_results = test_strategy(
         buy_and_hold_year, "BH", stock_list, purchase_frequency=1,redistribute = False
     )
-    buy_and_hold_year_results = test_strategy(
-        buy_and_hold_year, "BH_redistribute", stock_list, purchase_frequency=1,redistribute = True
-    )
     mod_wb_distribute = test_strategy(
         MOD_WARI_B, "MOD_WARI_B", stock_list, purchase_frequency=1,redistribute = True
     )
