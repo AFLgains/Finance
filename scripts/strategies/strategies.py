@@ -3,7 +3,7 @@ import pickle
 import time
 from collections import defaultdict
 from functools import reduce
-from typing import List
+from typing import List, Dict
 
 import numpy as np
 import pandas as pd
@@ -22,6 +22,7 @@ class strategy:
     def __init__(
         self,
         stock_data: List[stock],
+        price_list: Dict,
         name: str,
         purchase_frequency: int = 1,
         redistribute: bool = False,
@@ -34,6 +35,7 @@ class strategy:
         self.purchase_frequency = purchase_frequency
         self.redistribute = redistribute
         self.opt_port = opt_port
+        self.stock_price_dict = price_list
         self.dates_considered = get_unique_dates(stock_data, "formatted_date")
         self.yearly_purchase_dates = get_unique_dates(stock_data, "year_first_day")
         self.date_lists = {
@@ -229,7 +231,7 @@ class strategy:
                 # Generate the amount to redistribute
                 if self.redistribute and self.opt_port and len(buys) > 1:
                     incr_redistribute, portfolio_cash = get_optimal_distributions(
-                        stock_dictionary=self.stock_dictionary,
+                        stock_price_dictionary = self.stock_price_dict,
                         portfolio_cash=portfolio_cash,
                         buys=buys,
                         buy_date=transaction_date,
@@ -292,12 +294,13 @@ class buy_and_hold_year(strategy):
     def __init__(
         self,
         stock_data: List[stock],
+        price_list: Dict,
         purchase_frequency: int,
         redistribute=False,
         opt_port=True,
         name: str = "buy_and_hold_yearly",
     ):
-        super().__init__(stock_data, name, purchase_frequency, redistribute, opt_port)
+        super().__init__(stock_data, price_list, name, purchase_frequency, redistribute, opt_port)
 
     def run(self):
         # Build any metrics that need to be added to the stock price history
@@ -338,6 +341,7 @@ class red_white_blue(strategy):
     def __init__(
         self,
         stock_data: List[stock],
+        price_list: Dict,
         name="Red_white_blue",
         purchase_frequency=1,
         redistribute=False,
@@ -345,7 +349,7 @@ class red_white_blue(strategy):
         emas_lt_used: List[int] = None,
     ):
 
-        super().__init__(stock_data, name, purchase_frequency, redistribute)
+        super().__init__(stock_data, price_list,name, purchase_frequency, redistribute)
 
         if emas_st_used is None:
             self.emas_st_used = [3, 5, 8, 10, 12, 15]
@@ -403,6 +407,7 @@ class ROC_PE(strategy):
     def __init__(
         self,
         stock_data: List[stock],
+        price_list: Dict,
         purchase_frequency,
         redistribute=False,
         stock_limit=10,
@@ -414,7 +419,7 @@ class ROC_PE(strategy):
         name="ROC_PE",
     ):
 
-        super().__init__(stock_data, name, purchase_frequency, redistribute)
+        super().__init__(stock_data,price_list, name, purchase_frequency, redistribute)
         assert pe_upper_limit >= 0
         assert pe_lower_limit >= 0
         assert roce_lower_limit > 0
@@ -510,6 +515,7 @@ class MOD_LIL_BOOK(strategy):
     def __init__(
         self,
         stock_data: List[stock],
+        price_list: Dict,
         purchase_frequency,
         redistribute=False,
         opt_port=True,
@@ -522,7 +528,7 @@ class MOD_LIL_BOOK(strategy):
         name="MOD_LIL_BOOK",
     ):
 
-        super().__init__(stock_data, name, purchase_frequency, redistribute, opt_port)
+        super().__init__(stock_data,price_list, name, purchase_frequency, redistribute, opt_port)
         assert pe_upper_limit >= 0
         assert pe_lower_limit >= 0
         assert roa_lower_limit > 0
@@ -608,13 +614,14 @@ class MOD_WARI_B(strategy):
     def __init__(
         self,
         stock_data: List[stock],
+        price_list: Dict,
         purchase_frequency,
         opt_port=True,
         redistribute=False,
         stock_limit=10,
         name="MOD_WARI_B",
     ):
-        super().__init__(stock_data, name, purchase_frequency, redistribute, opt_port)
+        super().__init__(stock_data,price_list, name, purchase_frequency, redistribute, opt_port)
         self.stock_limit = stock_limit
 
     def run(self):

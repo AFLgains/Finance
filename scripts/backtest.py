@@ -63,6 +63,8 @@ FINAL_COLUMNS = [
     "Return on Assets",
 ]
 
+FINAL_PRICE_COLUMNS = [TICKER,DATE,ADJ_CLOSE,]
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s:%(levelname)s:%(name)s:%(message)s",
@@ -323,11 +325,13 @@ def build_data_cube(run_configs: Configuration) -> pd.DataFrame:
     df_final_no_buy_time = generate_metrics_after_join(df_no_metrics)
     df_final = generate_buy_time(df_final_no_buy_time)
     df_final = df_final[FINAL_COLUMNS]
+    df_price_matrix = df_final[FINAL_PRICE_COLUMNS]
     if True:
         with open("data_cube.pkl", "wb") as f:
             pickle.dump(df_final, f)
 
-    return df_final.dropna()
+
+    return df_final.dropna(), df_price_matrix.dropna()
 
 
 def validate(data_df: pd.DataFrame, stock_name: str, run_config: Configuration) -> bool:
@@ -354,8 +358,9 @@ def validate(data_df: pd.DataFrame, stock_name: str, run_config: Configuration) 
 
 
 @log_runtime
-def build_stock_list(data_df: pd.DataFrame, run_config: Configuration) -> List[stock]:
+def build_stock_list(data_df: pd.DataFrame, df_price: pd.DataFrame, run_config: Configuration) -> List[stock]:
 
+    # Caclulate the stock price list
     data_df_list = [
         data_df.loc[data_df.Ticker == x, :].rename(
             columns={"Date": "formatted_date", "Adj. Close": "adjclose"}
@@ -368,19 +373,26 @@ def build_stock_list(data_df: pd.DataFrame, run_config: Configuration) -> List[s
         stock(name=x.Ticker[0], price_history=x, date_start=x.index[0])
         for x in data_df_list
     ]
-    print(f"Universe size: {len(stock_list)} stocks")
+    logging.info(f"Universe size: {len(stock_list)} stocks")
 
-    return stock_list
+    # Calculate the price list
+    df_price_dict = {
+        x: df_price.loc[df_price.Ticker == x, :].rename(
+            columns={"Date": "formatted_date", "Adj. Close": "adjclose"}
+        ).set_index("formatted_date", drop=False)
+        for x in set(df_price.Ticker)
+    }
+
+    return stock_list, df_price_dict
 
 
 def main():
-
+    # Run the configuration
     run_config = load_configuration()
+
     # Build the data cube and stock lists
-    df_final = build_data_cube(run_config)
-    # df_final.to_csv(os.path.join(cdir,"output","validations.csv"))
-    # df_final = df_final.loc[df_final.year >= "2015"]
-    stock_list = build_stock_list(df_final, run_config)
+    df_final, df_price = build_data_cube(run_config)
+    stock_list, price_list = build_stock_list(df_final, df_price, run_config)
 
     # Print out the results nicely
     print_evaluation_header()
@@ -388,6 +400,7 @@ def main():
         buy_and_hold_year,
         "BH",
         stock_list,
+        price_list = price_list,
         purchase_frequency=1,
         redistribute=True,
         opt_port=False,
@@ -396,6 +409,7 @@ def main():
         MOD_WARI_B,
         "MOD_WARI_B",
         stock_list,
+        price_list=price_list,
         purchase_frequency=1,
         redistribute=True,
         opt_port=True,
@@ -414,6 +428,7 @@ def main():
                         + "_"
                         + str(rev_limit),
                         stock_list,
+                        price_list=price_list,
                         purchase_frequency=1,
                         redistribute=redistribute,
                         opt_port=True,

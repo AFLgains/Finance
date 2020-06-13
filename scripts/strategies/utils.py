@@ -49,10 +49,11 @@ def create_contiguous_buy_signals(stock: stock):
     return price_history_group
 
 
-def gen_price_history_df(stock_dictionary, tickers, buy_date):
+def gen_price_history_df(stock_price_dictionary, tickers, buy_date):
+    tickers =tickers
 
     data_frames = [
-        stock_dictionary[b].price_history[["adjclose"]].rename(columns={"adjclose": b})
+        stock_price_dictionary[b][["adjclose"]].rename(columns={"adjclose": b})
         for b in tickers
     ]
     df_merged = reduce(
@@ -82,12 +83,12 @@ def get_flat_distributions(portfolio_cash, buys) -> Dict:
     return output_redistribute, output_portfolio_cash
 
 
-def get_optimal_distributions(stock_dictionary, portfolio_cash, buys, buy_date):
+def get_optimal_distributions(stock_price_dictionary, portfolio_cash, buys, buy_date):
     output_redistribute = {}
     output_portfolio_cash = {}
     total_cash = sum([v for x, v in portfolio_cash.items()])
     price_histories = gen_price_history_df(
-        stock_dictionary, [b.name for b in buys], buy_date
+        stock_price_dictionary, [b.name for b in buys], buy_date
     )
 
     if not len(price_histories.index) > len(price_histories.columns):
