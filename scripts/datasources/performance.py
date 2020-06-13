@@ -34,7 +34,9 @@ def test_strategy(strat_class, name, data_df, purchase_frequency, **kwargs):
     strategy_instance.run()
     total_portfolio_metrics = strategy_instance.evaluate()
 
-    annualised_trades = [tr for tr in total_portfolio_metrics["annualised_trades"] if tr < 10]
+    annualised_trades = [
+        tr for tr in total_portfolio_metrics["annualised_trades"] if tr < 10
+    ]
 
     res = [
         name,

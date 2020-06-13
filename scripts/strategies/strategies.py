@@ -10,7 +10,6 @@ import pandas as pd
 from datasources.data_classes import (portfolio, stock, stock_purchase,
                                       strategy_metrics, trade_class)
 from datasources.performance import test_strategy
-
 from strategies.utils import *
 from yahoofinancials import YahooFinancials
 
@@ -26,7 +25,7 @@ class strategy:
         name: str,
         purchase_frequency: int = 1,
         redistribute: bool = False,
-        opt_port: bool = False
+        opt_port: bool = False,
     ):
 
         assert check_stock_data(stock_data)
@@ -188,7 +187,9 @@ class strategy:
         for transaction_date in sorted_transaction_dates:
             # obtain sells and buys
             sells = [
-                p for p in self.portfolio.past_purchases if p.date_sold == transaction_date
+                p
+                for p in self.portfolio.past_purchases
+                if p.date_sold == transaction_date
             ]
             buys = [
                 p
@@ -198,20 +199,27 @@ class strategy:
 
             # First do sells
             for s in sells:
-                if current_open_trades[s.name].stock_purchase_data.date_sold == transaction_date:
+                if (
+                    current_open_trades[s.name].stock_purchase_data.date_sold
+                    == transaction_date
+                ):
                     # Find the trade that it refers to:
                     tr = current_open_trades[s.name]
                     # Add the amount of cash generated to the pool
                     portfolio_cash[s.name] = tr.amount * (
-                            1 + tr.stock_purchase_data.pct_change
+                        1 + tr.stock_purchase_data.pct_change
                     )
                     # Update our metrics
-                    if tr.stock_purchase_data.pct_change>0:
+                    if tr.stock_purchase_data.pct_change > 0:
                         total_gains += 1
-                        total_weight_gains += tr.amount*tr.stock_purchase_data.pct_change
+                        total_weight_gains += (
+                            tr.amount * tr.stock_purchase_data.pct_change
+                        )
                     else:
                         total_losses += 1
-                        total_weight_losses += tr.amount*tr.stock_purchase_data.pct_change
+                        total_weight_losses += (
+                            tr.amount * tr.stock_purchase_data.pct_change
+                        )
 
                     # Close the trade
                     current_open_trades.pop(s.name)
@@ -220,23 +228,26 @@ class strategy:
             if buys:
                 # Generate the amount to redistribute
                 if self.redistribute and self.opt_port and len(buys) > 1:
-                    incr_redistribute, portfolio_cash  = get_optimal_distributions(
-                        stock_dictionary = self.stock_dictionary,
+                    incr_redistribute, portfolio_cash = get_optimal_distributions(
+                        stock_dictionary=self.stock_dictionary,
                         portfolio_cash=portfolio_cash,
                         buys=buys,
                         buy_date=transaction_date,
                     )
                 elif self.redistribute:
-                    incr_redistribute, portfolio_cash  = get_flat_distributions(
+                    incr_redistribute, portfolio_cash = get_flat_distributions(
                         portfolio_cash=portfolio_cash, buys=buys
                     )
                 else:
-                    incr_redistribute, portfolio_cash = get_no_distribution(portfolio_cash=portfolio_cash, buys=buys)
+                    incr_redistribute, portfolio_cash = get_no_distribution(
+                        portfolio_cash=portfolio_cash, buys=buys
+                    )
 
                 for b in buys:
                     current_open_trades[b.name] = trade_class(
                         stock_purchase_data=b,
-                        amount=initial_stock_purchased_cash[b.name] + incr_redistribute[b.name]
+                        amount=initial_stock_purchased_cash[b.name]
+                        + incr_redistribute[b.name],
                     )
                     initial_stock_purchased_cash[b.name] = 0
 
@@ -273,7 +284,6 @@ class strategy:
         return total_portfolio_metrics
 
 
-
 class buy_and_hold_year(strategy):
     """
     Naive strategy to simply purchase the stock as soon as data becomes available and never sell it until the end.
@@ -284,7 +294,7 @@ class buy_and_hold_year(strategy):
         stock_data: List[stock],
         purchase_frequency: int,
         redistribute=False,
-        opt_port = True,
+        opt_port=True,
         name: str = "buy_and_hold_yearly",
     ):
         super().__init__(stock_data, name, purchase_frequency, redistribute, opt_port)
@@ -300,7 +310,7 @@ class buy_and_hold_year(strategy):
             )  # for every buy date update the porfoilio during this data
 
         # Sell everything at the end
-        for k,v in self.stock_dictionary.items():
+        for k, v in self.stock_dictionary.items():
             if self.currently_hold_stock(k):
                 self.sell(k, max(v.price_history.formatted_date))
 
@@ -502,7 +512,7 @@ class MOD_LIL_BOOK(strategy):
         stock_data: List[stock],
         purchase_frequency,
         redistribute=False,
-        opt_port = True,
+        opt_port=True,
         stock_limit=10,
         pe_upper_limit=40,
         pe_lower_limit=5,
@@ -551,7 +561,6 @@ class MOD_LIL_BOOK(strategy):
                 metric_dict[name] = stock.price_history[metric_str][buy_date]
         return metric_dict
 
-
     def update_portfolio(self, buy_date):
 
         # Sell all stocks,
@@ -562,7 +571,7 @@ class MOD_LIL_BOOK(strategy):
         # Measure the ratio
         pe_ratio_unfiltered = {
             name: stock.price_history["P/E"][buy_date]
-            for name,stock in self.stock_dictionary.items()
+            for name, stock in self.stock_dictionary.items()
             if buy_date in stock.price_history.index
         }
 
@@ -600,7 +609,7 @@ class MOD_WARI_B(strategy):
         self,
         stock_data: List[stock],
         purchase_frequency,
-        opt_port = True,
+        opt_port=True,
         redistribute=False,
         stock_limit=10,
         name="MOD_WARI_B",
@@ -712,4 +721,3 @@ class buy_and_hold(strategy):
 
         # update portfolio for the stock
         self.update_portfolio_stock(stock)
-

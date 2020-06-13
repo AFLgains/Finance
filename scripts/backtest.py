@@ -384,18 +384,28 @@ def main():
 
     # Print out the results nicely
     print_evaluation_header()
-    buy_and_hold_year_results = test_strategy(
-        buy_and_hold_year, "BH", stock_list, purchase_frequency=1, redistribute=True, opt_port = False
+    test_strategy(
+        buy_and_hold_year,
+        "BH",
+        stock_list,
+        purchase_frequency=1,
+        redistribute=True,
+        opt_port=False,
     )
-    mod_wb_distribute = test_strategy(
-        MOD_WARI_B, "MOD_WARI_B", stock_list, purchase_frequency=1, redistribute=True, opt_port = True
+    test_strategy(
+        MOD_WARI_B,
+        "MOD_WARI_B",
+        stock_list,
+        purchase_frequency=1,
+        redistribute=True,
+        opt_port=True,
     )
 
     for redistribute in [True, False]:
         for rev_limit in [5, 10]:
             for roa_lower_limit in [0.15]:
                 for stock_limit in [10, 20, 30]:
-                    MOD_LIL_BOOK_20 = test_strategy(
+                    test_strategy(
                         MOD_LIL_BOOK,
                         "MOD_LB_"
                         + str(stock_limit)
@@ -406,7 +416,7 @@ def main():
                         stock_list,
                         purchase_frequency=1,
                         redistribute=redistribute,
-                        opt_port = True,
+                        opt_port=True,
                         stock_limit=stock_limit,
                         roa_lower_limit=roa_lower_limit,
                         min_revenue=rev_limit * 1e8,
