@@ -67,7 +67,6 @@ def hub_setup(run_configs):
 
 
 @log_runtime
-
 def update_fundamental_data(
     hub,
     run_configs: Configuration,

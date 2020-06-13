@@ -22,7 +22,6 @@ class strategy:
         self.strategy_name = name
         self.stock_data = self.check_stock_data(stock_data)
         self.purchase_frequency = purchase_frequency
-
         self.dates_considered = self.get_unique_dates(self.stock_data,"formatted_date")
         self.yearly_purchase_dates = self.get_unique_dates(self.stock_data, "year_first_day")
         self.date_lists = {st.name: st.price_history.formatted_date.tolist() for st in self.stock_data}
