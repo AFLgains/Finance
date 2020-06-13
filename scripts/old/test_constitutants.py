@@ -20,5 +20,3 @@ historical_sandp_2010 = historical_sandp.loc[
 ]
 historical_sandp_2010_list = list(set(historical_sandp_2010.tolist()))
 ";".join(historical_sandp_2010_list)
-
-

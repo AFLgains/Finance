@@ -18,7 +18,7 @@ sf.set_data_dir(os.path.join("C:\Personalprojects\Finance\scripts", "raw_data"))
 # Load the annual Income Statements for all companies in USA.
 # The data is automatically downloaded if you don't have it already.
 # df = sf.load_income(variant='quarterly-full', market='us')
-#df_income = sf.load_income(variant="ttm-full", market="us")
+# df_income = sf.load_income(variant="ttm-full", market="us")
 # df_balance = sf.load_balance(variant='annual-full', market='us')
 # df_cash = sf.load_cashflow(variant='annual-full', market='us')
 
@@ -32,7 +32,7 @@ sf.set_data_dir(os.path.join("C:\Personalprojects\Finance\scripts", "raw_data"))
 stock_tocker_str = random.sample(set(df_income.reset_index().Ticker), 500)
 ";".join(stock_tocker_str)
 
-#see = df_income.loc[
+# see = df_income.loc[
 #    ["TSLA", "DIS", "MSFT"], [REVENUE, COST_REVENUE, GROSS_PROFIT, INCOME_TAX]
-#]
-#print(df_income.loc["TSLA", [CAPEX]])
+# ]
+# print(df_income.loc["TSLA", [CAPEX]])

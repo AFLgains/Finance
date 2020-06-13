@@ -18,10 +18,13 @@ def log_runtime(func: Callable) -> Callable:
 
     return log_time
 
+
 def setup_logging(logger):
 
     # cannot use logging.basicConfig bc pystan calls basicConfig itself
-    fmt = logging.Formatter("%(asctime)s:%(levelname)s:%(name)s:%(message)s", "%Y-%m-%d %H:%M:%S")
+    fmt = logging.Formatter(
+        "%(asctime)s:%(levelname)s:%(name)s:%(message)s", "%Y-%m-%d %H:%M:%S"
+    )
 
     # utc timestamps
     fmt.converter = time.gmtime

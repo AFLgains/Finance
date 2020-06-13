@@ -1,11 +1,14 @@
 import pandas as pd
-from pypfopt import EfficientFrontier, objective_functions
-from pypfopt import risk_models
-from pypfopt import expected_returns
+from pypfopt import (EfficientFrontier, expected_returns, objective_functions,
+                     risk_models)
 from pypfopt.discrete_allocation import DiscreteAllocation, get_latest_prices
 
 # Read in price data
-df = pd.read_csv("https://raw.githubusercontent.com/robertmartin8/PyPortfolioOpt/master/tests/resources/stock_prices.csv", parse_dates=True, index_col="date")
+df = pd.read_csv(
+    "https://raw.githubusercontent.com/robertmartin8/PyPortfolioOpt/master/tests/resources/stock_prices.csv",
+    parse_dates=True,
+    index_col="date",
+)
 
 # Calculate expected returns and sample covariance
 mu = expected_returns.mean_historical_return(df)

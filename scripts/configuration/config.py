@@ -39,7 +39,7 @@ def load_configuration() -> Configuration:
     envs = {
         "apikey": os.getenv("API_KEY"),
         "refresh_rate": os.getenv("REFRESH_RATE_OVERIDE"),
-        "save_output": os.getenv("SAVE_OUTPUT_OVERRIDE")
+        "save_output": os.getenv("SAVE_OUTPUT_OVERRIDE"),
     }
     envs = {k: v for k, v in envs.items() if v is not None}
 
@@ -47,7 +47,7 @@ def load_configuration() -> Configuration:
     defaults = scenarios["defaults"]
     name_args = scenarios["named_runs"][name] or {}
     kwargs = {**name_args, **defaults, **envs}
-    kwargs["name"]=name
+    kwargs["name"] = name
 
     config = Configuration(**kwargs)
     return config

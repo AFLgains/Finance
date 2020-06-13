@@ -20,7 +20,6 @@ class stock_purchase:
 class trade_class:
     stock_purchase_data: stock_purchase
     amount: float
-    status: str
 
 
 @dataclass
