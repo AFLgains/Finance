@@ -159,8 +159,8 @@ class strategy:
         # money at the end based on total invested (total ROI)
 
         # Obtain dates
-        start_date = min(self.dates_considered)
-        end_date = max(self.dates_considered)
+        start_date = min(self.yearly_purchase_dates)
+        end_date = max(self.yearly_purchase_dates)
         total_years = (end_date - start_date).days / 365
         dates_sold = set([x.date_sold for x in self.portfolio.past_purchases])
         dates_bought = set([x.date_bought for x in self.portfolio.past_purchases])
@@ -284,7 +284,7 @@ class buy_and_hold_year(strategy):
         stock_data: List[stock],
         purchase_frequency: int,
         redistribute=False,
-        opt_port = False,
+        opt_port = True,
         name: str = "buy_and_hold_yearly",
     ):
         super().__init__(stock_data, name, purchase_frequency, redistribute, opt_port)
@@ -502,6 +502,7 @@ class MOD_LIL_BOOK(strategy):
         stock_data: List[stock],
         purchase_frequency,
         redistribute=False,
+        opt_port = True,
         stock_limit=10,
         pe_upper_limit=40,
         pe_lower_limit=5,
@@ -511,7 +512,7 @@ class MOD_LIL_BOOK(strategy):
         name="MOD_LIL_BOOK",
     ):
 
-        super().__init__(stock_data, name, purchase_frequency, redistribute)
+        super().__init__(stock_data, name, purchase_frequency, redistribute, opt_port)
         assert pe_upper_limit >= 0
         assert pe_lower_limit >= 0
         assert roa_lower_limit > 0
@@ -599,12 +600,12 @@ class MOD_WARI_B(strategy):
         self,
         stock_data: List[stock],
         purchase_frequency,
-        opt_port = False,
+        opt_port = True,
         redistribute=False,
         stock_limit=10,
         name="MOD_WARI_B",
     ):
-        super().__init__(stock_data, name, purchase_frequency, redistribute)
+        super().__init__(stock_data, name, purchase_frequency, redistribute, opt_port)
         self.stock_limit = stock_limit
 
     def run(self):

@@ -391,24 +391,26 @@ def main():
         MOD_WARI_B, "MOD_WARI_B", stock_list, purchase_frequency=1, redistribute=True, opt_port = True
     )
 
-    for rev_limit in [5, 10]:
-        for roa_lower_limit in [0.15]:
-            for stock_limit in [10, 20, 30]:
-                MOD_LIL_BOOK_20 = test_strategy(
-                    MOD_LIL_BOOK,
-                    "MOD_LB_"
-                    + str(stock_limit)
-                    + "_"
-                    + str(roa_lower_limit)
-                    + "_"
-                    + str(rev_limit),
-                    stock_list,
-                    purchase_frequency=1,
-                    redistribute=True,
-                    stock_limit=stock_limit,
-                    roa_lower_limit=roa_lower_limit,
-                    min_revenue=rev_limit * 1e8,
-                )
+    for redistribute in [True, False]:
+        for rev_limit in [5, 10]:
+            for roa_lower_limit in [0.15]:
+                for stock_limit in [10, 20, 30]:
+                    MOD_LIL_BOOK_20 = test_strategy(
+                        MOD_LIL_BOOK,
+                        "MOD_LB_"
+                        + str(stock_limit)
+                        + "_"
+                        + str(roa_lower_limit)
+                        + "_"
+                        + str(rev_limit),
+                        stock_list,
+                        purchase_frequency=1,
+                        redistribute=redistribute,
+                        opt_port = True,
+                        stock_limit=stock_limit,
+                        roa_lower_limit=roa_lower_limit,
+                        min_revenue=rev_limit * 1e8,
+                    )
 
     # red_white_blue_results = test_strategy(
     #    red_white_blue, "red_white_blue", stock_list, purchase_frequency=1

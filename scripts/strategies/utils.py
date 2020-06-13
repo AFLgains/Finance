@@ -53,7 +53,6 @@ def gen_price_history_df(stock_dictionary, tickers, buy_date):
         lambda left, right: pd.merge(left, right, on="formatted_date", how="left"),
         data_frames,
     )
-
     return df_merged.loc[df_merged.index <= buy_date].dropna()
 
 def get_no_distribution(portfolio_cash, buys) -> Dict:
@@ -93,6 +92,7 @@ def get_optimal_distributions(stock_dictionary, portfolio_cash, buys, buy_date):
     ef.add_objective(objective_functions.L2_reg, gamma=1)
     ef.max_sharpe()
     cleaned_weights = ef.clean_weights()
+    print("Cleaned_weights")
 
     # Add it to buys
     for b in buys:
