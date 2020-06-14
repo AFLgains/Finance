@@ -5,7 +5,7 @@ import pandas as pd
 from datasources.data_classes import (portfolio, stock, stock_purchase,
                                       strategy_metrics, trade_class)
 from pypfopt import (EfficientFrontier, expected_returns, objective_functions,
-                     risk_models)
+                     risk_models, plotting)
 
 
 def check_stock_data(stock_data) -> bool:
@@ -95,15 +95,18 @@ def get_optimal_distributions(stock_price_dictionary, portfolio_cash, buys, buy_
         return get_flat_distributions(portfolio_cash, buys)
 
     # Obtain the historical return and sample cov.
-    mu = expected_returns.mean_historical_return(price_histories)
-    S = risk_models.sample_cov(price_histories)
+    mu = expected_returns.ema_historical_return(price_histories)
+    S = risk_models.exp_cov(price_histories)
 
     # Optimise for maximal Sharpe ratio using L2 regularization
     ef = EfficientFrontier(mu, S)
     ef.add_objective(objective_functions.L2_reg, gamma=1)
     ef.max_sharpe()
     cleaned_weights = ef.clean_weights()
-    print("Cleaned_weights")
+
+    #ef.portfolio_performance(verbose=True)
+    #plotting.plot_efficient_frontier()
+
 
     # Add it to buys
     for b in buys:
